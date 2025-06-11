@@ -1,16 +1,12 @@
 CONSULTAS
 1. Nom i preu dels productes amb stock > 33 i categoria "ipad" (només el nom):
-js
-Copiar
-Editar
+
 db.products.find(
   { stock: { $gt: 33 }, categories: "ipad" },
   { name: 1, _id: 0 }
 )
 2. Restaurants al Bronx amb cuina "Chinese" o "Gelato":
-js
-Copiar
-Editar
+
 db.restaurants.find(
   {
     borough: "Bronx",
@@ -18,16 +14,12 @@ db.restaurants.find(
   }
 )
 3. Llibres amb 8 autors (pretty):
-js
-Copiar
-Editar
+
 db.llibres.find(
   { authors: { $size: 8 } }
 ).pretty()
 4. Restaurants al carrer "Third Avenue" amb cuina "Pizza", ordenats descendent per name:
-js
-Copiar
-Editar
+
 db.restaurants.find(
   {
     "address.street": "Third Avenue",
@@ -35,9 +27,7 @@ db.restaurants.find(
   }
 ).sort({ name: -1 })
 5. Llibres que no tenen com autors ni "Anthony Briggs" ni "Adele Goldberg" (mostrar només authors):
-js
-Copiar
-Editar
+
 db.llibres.find(
   {
     authors: {
@@ -47,9 +37,7 @@ db.llibres.find(
   { authors: 1, _id: 0 }
 )
 6. Llibres amb longDescription que acabi en "e", mostrant isbn i longDescription:
-js
-Copiar
-Editar
+
 db.llibres.find(
   {
     longDescription: { $regex: /e$/ }
@@ -57,9 +45,7 @@ db.llibres.find(
   { isbn: 1, longDescription: 1, _id: 0 }
 )
 7. Llibres amb entre 200 i 500 pàgines, ordenats per id descendent i pretty:
-js
-Copiar
-Editar
+
 db.llibres.find(
   {
     pageCount: { $gte: 200, $lte: 500 }
@@ -67,17 +53,13 @@ db.llibres.find(
 ).sort({ _id: -1 }).pretty()
 🛠 ACTUALITZACIONS
 1. Afegir autor "Sam Watters" a "CodeGeneration in Action" si no hi és:
-js
-Copiar
-Editar
+
 db.llibres.updateOne(
   { title: "CodeGeneration in Action" },
   { $addToSet: { authors: "Sam Watters" } }
 )
 2. Afegir camp Assessment: 300 als llibres amb categoria "Internet" i status "Publish":
-js
-Copiar
-Editar
+
 db.llibres.updateMany(
   {
     categories: "Internet",
@@ -86,17 +68,13 @@ db.llibres.updateMany(
   { $set: { Assessment: 300 } }
 )
 3. Modificar el tercer autor del llibre "Portlets and apache portals":
-js
-Copiar
-Editar
+
 db.llibres.updateOne(
   { title: "Portlets and apache portals" },
   { $set: { "authors.2": "Tim Robinson" } }
 )
 4. Canviar categoria de "Macbook Pro" de "notebook" a "ipad":
-js
-Copiar
-Editar
+
 db.products.updateOne(
   { name: "MacBook Pro" },
   {
@@ -106,41 +84,31 @@ db.products.updateOne(
 )
 🗑 ELIMINACIONS
 1. Eliminar el camp thumbnailUrl de tots els llibres:
-js
-Copiar
-Editar
+
 db.llibres.updateMany(
   {},
   { $unset: { thumbnailUrl: "" } }
 )
 2. Eliminar llibres amb la paraula "User" en longDescription (case-sensitive):
-js
-Copiar
-Editar
+
 db.llibres.deleteMany(
   { longDescription: { $regex: "User" } }
 )
 3. Eliminar autor "chris gray" de "ajax in practice":
-js
-Copiar
-Editar
+
 db.llibres.updateOne(
   { title: "ajax in practice" },
   { $pull: { authors: "chris gray" } }
 )
 4. Eliminar última categoria del llibre "Struts in Action":
-js
-Copiar
-Editar
+
 db.llibres.updateOne(
   { title: "Struts in Action" },
   { $pop: { categories: 1 } }  // 1 per últim element
 )
 📊 AGREGACIONS (amb explicacions)
 1. Mitjana dels preus dels productes:
-js
-Copiar
-Editar
+
 db.products.aggregate([
   {
     $group: {
@@ -158,9 +126,7 @@ _id: null: no agrupa per cap camp específic.
 $avg: "$price": calcula la mitjana del camp price.
 
 2. Quants restaurants hi ha per tipus de cuina:
-js
-Copiar
-Editar
+
 db.restaurants.aggregate([
   {
     $group: {
@@ -176,9 +142,7 @@ Agrupem per cuisine.
 Per cada grup, incrementem un contador amb $sum: 1.
 
 3. Coordenades per cada street:
-js
-Copiar
-Editar
+
 db.restaurants.aggregate([
   {
     $group: {
@@ -194,9 +158,7 @@ Agrupem per carrer (address.street).
 $addToSet: afegeix valors únics de coordenades per carrer.
 
 4. Número de categories per cada producte, ordenat de menys a més:
-js
-Copiar
-Editar
+
 db.products.aggregate([
   {
     $project: {
@@ -213,9 +175,7 @@ $project: creem un nou camp numCategories que compta quantes categories té cada
 $sort: ordenem ascendentment.
 
 5. Número de vegades que apareix cada categoria (global):
-js
-Copiar
-Editar
+
 db.products.aggregate([
   { $unwind: "$categories" },
   {
